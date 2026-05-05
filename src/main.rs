@@ -16,7 +16,7 @@ fn main() -> anyhow::Result<()> {
         hotkey::{register_all, unregister_all},
         tray::{build_tray, next_menu_event},
     };
-    use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
+    use windows::Win32::Foundation::HWND;
     use windows::Win32::UI::WindowsAndMessaging::{
         DispatchMessageW, PeekMessageW, TranslateMessage, MSG, PM_REMOVE, WM_HOTKEY, WM_QUIT,
     };
