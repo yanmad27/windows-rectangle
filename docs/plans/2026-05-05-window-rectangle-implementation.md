@@ -1011,6 +1011,10 @@ use windows::Win32::UI::WindowsAndMessaging::{
     HWND_TOP, SWP_NOACTIVATE, SWP_NOZORDER, SW_MAXIMIZE, SW_RESTORE,
 };
 
+fn hwnd_to_key(window: HWND) -> isize {
+    window.0 as isize
+}
+
 static RESTORE_STACK: Mutex<Option<HashMap<isize, Rect>>> = Mutex::new(None);
 
 fn restore_stack() -> std::sync::MutexGuard<'static, Option<HashMap<isize, Rect>>> {
@@ -1023,7 +1027,7 @@ fn restore_stack() -> std::sync::MutexGuard<'static, Option<HashMap<isize, Rect>
 
 pub fn foreground_window() -> Option<HWND> {
     let hwnd = unsafe { GetForegroundWindow() };
-    if hwnd.0 == 0 {
+    if hwnd.is_invalid() {
         None
     } else {
         Some(hwnd)
@@ -1031,15 +1035,14 @@ pub fn foreground_window() -> Option<HWND> {
 }
 
 pub fn is_valid_window(window: HWND) -> bool {
-    unsafe { IsWindow(window).as_bool() }
+    unsafe { IsWindow(Some(window)).as_bool() }
 }
 
 pub fn current_rect(window: HWND) -> Result<Rect> {
     let mut raw = RECT::default();
     unsafe {
-        if !GetWindowRect(window, &mut raw).is_ok() {
-            return Err(anyhow!("GetWindowRect failed"));
-        }
+        GetWindowRect(window, &mut raw)
+            .map_err(|e| anyhow!("GetWindowRect failed: {e}"))?;
     }
     Ok(Rect::new(
         raw.left,
@@ -1067,7 +1070,7 @@ pub fn apply_rect(window: HWND, target: Rect) -> Result<()> {
     unsafe {
         SetWindowPos(
             window,
-            HWND_TOP,
+            Some(HWND_TOP),
             target.x,
             target.y,
             target.width,
@@ -1096,7 +1099,7 @@ pub fn maximize_toggle(window: HWND) -> Result<()> {
 pub fn restore_original(window: HWND) -> Result<bool> {
     let mut guard = restore_stack();
     let map = guard.as_mut().unwrap();
-    if let Some(saved) = map.remove(&window.0) {
+    if let Some(saved) = map.remove(&hwnd_to_key(window)) {
         if is_maximized(window) || is_minimized(window) {
             unsafe {
                 let _ = ShowWindow(window, SW_RESTORE);
@@ -1105,7 +1108,7 @@ pub fn restore_original(window: HWND) -> Result<bool> {
         unsafe {
             SetWindowPos(
                 window,
-                HWND_TOP,
+                Some(HWND_TOP),
                 saved.x,
                 saved.y,
                 saved.width,
@@ -1124,7 +1127,7 @@ fn capture_for_restore(window: HWND) -> Result<()> {
     let rect_now = current_rect(window)?;
     let mut guard = restore_stack();
     let map = guard.as_mut().unwrap();
-    map.insert(window.0, rect_now);
+    map.insert(hwnd_to_key(window), rect_now);
     Ok(())
 }
 ```
@@ -1179,7 +1182,7 @@ static OWN_WINDOWS: Mutex<Vec<isize>> = Mutex::new(Vec::new());
 static HOOK_HANDLE: Mutex<Option<HWINEVENTHOOK>> = Mutex::new(None);
 
 pub fn register_own_window(window: HWND) {
-    OWN_WINDOWS.lock().unwrap().push(window.0);
+    OWN_WINDOWS.lock().unwrap().push(window.0 as isize);
 }
 
 pub fn install_hook() -> Result<()> {
@@ -1187,7 +1190,7 @@ pub fn install_hook() -> Result<()> {
     unsafe {
         let initial = GetForegroundWindow();
         if !is_own(initial) && is_top_level_visible(initial) {
-            LAST_REAL_FOREGROUND.store(initial.0, Ordering::Relaxed);
+            LAST_REAL_FOREGROUND.store(initial.0 as isize, Ordering::Relaxed);
         }
     }
 
@@ -1203,7 +1206,7 @@ pub fn install_hook() -> Result<()> {
         )
     };
 
-    if hook.0 == 0 {
+    if hook.is_invalid() {
         return Err(anyhow!("SetWinEventHook returned null"));
     }
 
@@ -1224,12 +1227,12 @@ pub fn last_real_foreground() -> Option<HWND> {
     if raw == 0 {
         None
     } else {
-        Some(HWND(raw))
+        Some(HWND(raw as *mut std::ffi::c_void))
     }
 }
 
 fn is_own(window: HWND) -> bool {
-    OWN_WINDOWS.lock().unwrap().contains(&window.0)
+    OWN_WINDOWS.lock().unwrap().contains(&(window.0 as isize))
 }
 
 fn is_top_level_visible(window: HWND) -> bool {
@@ -1255,10 +1258,10 @@ unsafe extern "system" fn foreground_change_callback(
     if id_object != 0 || id_child != 0 {
         return;
     }
-    if window.0 == 0 || is_own(window) || !is_top_level_visible(window) {
+    if window.is_invalid() || is_own(window) || !is_top_level_visible(window) {
         return;
     }
-    LAST_REAL_FOREGROUND.store(window.0, Ordering::Relaxed);
+    LAST_REAL_FOREGROUND.store(window.0 as isize, Ordering::Relaxed);
 }
 ```
 
@@ -1634,7 +1637,7 @@ fn main() -> anyhow::Result<()> {
     let RawWindowHandle::Win32(raw) = window.window_handle()?.as_raw() else {
         return Err(anyhow!("expected Win32 window handle"));
     };
-    let message_window_hwnd = HWND(raw.hwnd.get());
+    let message_window_hwnd = HWND(raw.hwnd.get() as *mut std::ffi::c_void);
 
     register_own_window(message_window_hwnd);
     install_hook()?;

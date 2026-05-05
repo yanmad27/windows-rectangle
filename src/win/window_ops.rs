@@ -8,6 +8,10 @@ use windows::Win32::UI::WindowsAndMessaging::{
     HWND_TOP, SWP_NOACTIVATE, SWP_NOZORDER, SW_MAXIMIZE, SW_RESTORE,
 };
 
+fn hwnd_to_key(window: HWND) -> isize {
+    window.0 as isize
+}
+
 static RESTORE_STACK: Mutex<Option<HashMap<isize, Rect>>> = Mutex::new(None);
 
 fn restore_stack() -> std::sync::MutexGuard<'static, Option<HashMap<isize, Rect>>> {
@@ -20,7 +24,7 @@ fn restore_stack() -> std::sync::MutexGuard<'static, Option<HashMap<isize, Rect>
 
 pub fn foreground_window() -> Option<HWND> {
     let hwnd = unsafe { GetForegroundWindow() };
-    if hwnd.0 == 0 {
+    if hwnd.is_invalid() {
         None
     } else {
         Some(hwnd)
@@ -28,15 +32,14 @@ pub fn foreground_window() -> Option<HWND> {
 }
 
 pub fn is_valid_window(window: HWND) -> bool {
-    unsafe { IsWindow(window).as_bool() }
+    unsafe { IsWindow(Some(window)).as_bool() }
 }
 
 pub fn current_rect(window: HWND) -> Result<Rect> {
     let mut raw = RECT::default();
     unsafe {
-        if !GetWindowRect(window, &mut raw).is_ok() {
-            return Err(anyhow!("GetWindowRect failed"));
-        }
+        GetWindowRect(window, &mut raw)
+            .map_err(|e| anyhow!("GetWindowRect failed: {e}"))?;
     }
     Ok(Rect::new(
         raw.left,
@@ -64,7 +67,7 @@ pub fn apply_rect(window: HWND, target: Rect) -> Result<()> {
     unsafe {
         SetWindowPos(
             window,
-            HWND_TOP,
+            Some(HWND_TOP),
             target.x,
             target.y,
             target.width,
@@ -93,7 +96,7 @@ pub fn maximize_toggle(window: HWND) -> Result<()> {
 pub fn restore_original(window: HWND) -> Result<bool> {
     let mut guard = restore_stack();
     let map = guard.as_mut().unwrap();
-    if let Some(saved) = map.remove(&window.0) {
+    if let Some(saved) = map.remove(&hwnd_to_key(window)) {
         if is_maximized(window) || is_minimized(window) {
             unsafe {
                 let _ = ShowWindow(window, SW_RESTORE);
@@ -102,7 +105,7 @@ pub fn restore_original(window: HWND) -> Result<bool> {
         unsafe {
             SetWindowPos(
                 window,
-                HWND_TOP,
+                Some(HWND_TOP),
                 saved.x,
                 saved.y,
                 saved.width,
@@ -121,6 +124,6 @@ fn capture_for_restore(window: HWND) -> Result<()> {
     let rect_now = current_rect(window)?;
     let mut guard = restore_stack();
     let map = guard.as_mut().unwrap();
-    map.insert(window.0, rect_now);
+    map.insert(hwnd_to_key(window), rect_now);
     Ok(())
 }
