@@ -12,7 +12,7 @@ impl Rect {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Half {
     Left,
     Right,
@@ -20,7 +20,7 @@ pub enum Half {
     Bottom,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Corner {
     TopLeft,
     TopRight,
@@ -28,7 +28,7 @@ pub enum Corner {
     BottomRight,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Action {
     Halve(Half),
     Quarter(Corner),
