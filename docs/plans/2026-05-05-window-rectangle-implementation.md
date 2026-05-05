@@ -1354,7 +1354,7 @@ pub fn unregister_all(message_window: HWND, registered: &[usize]) {
 use crate::adjacency::find_adjacent_monitor;
 use crate::bindings::BINDINGS;
 use crate::cycle_state::{CycleDecision, CycleState};
-use crate::geometry::{compute_target_rect, Action, Half};
+use crate::geometry::{compute_target_rect, Action};
 use crate::win::foreground::last_real_foreground;
 use crate::win::monitor::{enumerate_monitors, monitor_from_window, work_area_for};
 use crate::win::window_ops::{
@@ -1429,7 +1429,7 @@ pub fn apply_action(window: HWND, action: Action) -> Result<()> {
                     monitors[adjacent_index].work_area,
                     monitors[adjacent_index].handle.0 as i64,
                 ),
-                None => (cur_work_area, monitor_id), // no neighbor; stay
+                None => return Ok(()), // no neighbor; no-op (no wrap) per design
             }
         }
         _ => (work_area_for(current_monitor)?, monitor_id),
