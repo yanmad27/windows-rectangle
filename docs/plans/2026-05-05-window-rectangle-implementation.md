@@ -1179,7 +1179,10 @@ use windows::Win32::UI::WindowsAndMessaging::{
 
 static LAST_REAL_FOREGROUND: AtomicIsize = AtomicIsize::new(0);
 static OWN_WINDOWS: Mutex<Vec<isize>> = Mutex::new(Vec::new());
-static HOOK_HANDLE: Mutex<Option<HWINEVENTHOOK>> = Mutex::new(None);
+// HWINEVENTHOOK wraps *mut c_void which is not Send/Sync, so we cannot keep it
+// in a Mutex<Option<HWINEVENTHOOK>> static. Store the raw pointer value as
+// isize via an AtomicIsize and reconstruct the handle when unhooking.
+static HOOK_HANDLE_RAW: AtomicIsize = AtomicIsize::new(0);
 
 pub fn register_own_window(window: HWND) {
     OWN_WINDOWS.lock().unwrap().push(window.0 as isize);
@@ -1210,12 +1213,14 @@ pub fn install_hook() -> Result<()> {
         return Err(anyhow!("SetWinEventHook returned null"));
     }
 
-    *HOOK_HANDLE.lock().unwrap() = Some(hook);
+    HOOK_HANDLE_RAW.store(hook.0 as isize, Ordering::Relaxed);
     Ok(())
 }
 
 pub fn uninstall_hook() {
-    if let Some(handle) = HOOK_HANDLE.lock().unwrap().take() {
+    let raw = HOOK_HANDLE_RAW.swap(0, Ordering::Relaxed);
+    if raw != 0 {
+        let handle = HWINEVENTHOOK(raw as *mut std::ffi::c_void);
         unsafe {
             let _ = UnhookWinEvent(handle);
         }
