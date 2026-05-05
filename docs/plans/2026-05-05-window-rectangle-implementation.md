@@ -1035,7 +1035,7 @@ pub fn foreground_window() -> Option<HWND> {
 }
 
 pub fn is_valid_window(window: HWND) -> bool {
-    unsafe { IsWindow(Some(window)).as_bool() }
+    unsafe { IsWindow(window).as_bool() }
 }
 
 pub fn current_rect(window: HWND) -> Result<Rect> {
@@ -1070,7 +1070,7 @@ pub fn apply_rect(window: HWND, target: Rect) -> Result<()> {
     unsafe {
         SetWindowPos(
             window,
-            Some(HWND_TOP),
+            HWND_TOP,
             target.x,
             target.y,
             target.width,
@@ -1108,7 +1108,7 @@ pub fn restore_original(window: HWND) -> Result<bool> {
         unsafe {
             SetWindowPos(
                 window,
-                Some(HWND_TOP),
+                HWND_TOP,
                 saved.x,
                 saved.y,
                 saved.width,
