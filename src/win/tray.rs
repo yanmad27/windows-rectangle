@@ -34,7 +34,7 @@ pub fn build_tray() -> Result<TrayHandle> {
 
     let icon = load_app_icon()?;
     let tray = TrayIconBuilder::new()
-        .with_tooltip("Window Rectangle")
+        .with_tooltip("Windows Rectangle")
         .with_icon(icon)
         .with_menu(Box::new(menu))
         .build()

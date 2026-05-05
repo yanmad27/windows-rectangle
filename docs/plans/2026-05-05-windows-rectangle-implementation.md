@@ -1,4 +1,4 @@
-# Window Rectangle Implementation Plan
+# Windows Rectangle Implementation Plan
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** Rust 2021, `windows` 0.58, `tray-icon` 0.19, `winit` 0.30, `anyhow` 1, `embed-resource` 2 (build dep).
 
-**Source design doc:** `docs/plans/2026-05-05-window-rectangle-design.md`
+**Source design doc:** `docs/plans/2026-05-05-windows-rectangle-design.md`
 
 ---
 
@@ -34,7 +34,7 @@
 
 Run:
 ```
-cargo init --name window-rectangle --vcs none
+cargo init --name windows-rectangle --vcs none
 ```
 Expected: creates `Cargo.toml` and `src/main.rs`.
 
@@ -42,17 +42,17 @@ Expected: creates `Cargo.toml` and `src/main.rs`.
 
 ```toml
 [package]
-name = "window-rectangle"
+name = "windows-rectangle"
 version = "0.1.0"
 edition = "2021"
 description = "Windows tray app to resize active window via hotkeys"
 
 [lib]
-name = "window_rectangle"
+name = "windows_rectangle"
 path = "src/lib.rs"
 
 [[bin]]
-name = "window-rectangle"
+name = "windows-rectangle"
 path = "src/main.rs"
 
 [dependencies]
@@ -101,7 +101,7 @@ pub mod geometry;
 ```rust
 #[cfg(not(target_os = "windows"))]
 fn main() {
-    eprintln!("window-rectangle is Windows-only");
+    eprintln!("windows-rectangle is Windows-only");
     std::process::exit(1);
 }
 
@@ -1542,7 +1542,7 @@ pub fn build_tray() -> Result<TrayHandle> {
 
     let icon = solid_color_icon(0x3B, 0x82, 0xF6); // blue
     let tray = TrayIconBuilder::new()
-        .with_tooltip("Window Rectangle")
+        .with_tooltip("Windows Rectangle")
         .with_icon(icon)
         .with_menu(Box::new(menu))
         .build()
@@ -1608,7 +1608,7 @@ Use `winit` to host a hidden message window. Receive `WM_HOTKEY` via raw event h
 ```rust
 #[cfg(not(target_os = "windows"))]
 fn main() {
-    eprintln!("window-rectangle is Windows-only");
+    eprintln!("windows-rectangle is Windows-only");
     std::process::exit(1);
 }
 
@@ -1616,7 +1616,7 @@ fn main() {
 fn main() -> anyhow::Result<()> {
     use anyhow::anyhow;
     use std::time::Duration;
-    use window_rectangle::win::{
+    use windows_rectangle::win::{
         dispatcher::{dispatch_binding_index, DispatchSource},
         foreground::{install_hook, register_own_window, uninstall_hook},
         hotkey::{register_all, unregister_all},
@@ -1634,7 +1634,7 @@ fn main() -> anyhow::Result<()> {
 
     let event_loop = EventLoop::builder().with_any_thread(false).build()?;
     let attributes = WindowAttributes::default()
-        .with_title("window-rectangle-msg")
+        .with_title("windows-rectangle-msg")
         .with_visible(false)
         .with_window_level(WindowLevel::AlwaysOnBottom);
 
@@ -1661,7 +1661,7 @@ fn main() -> anyhow::Result<()> {
             while PeekMessageW(&mut msg, message_window_hwnd, 0, 0, PM_REMOVE).as_bool() {
                 if msg.message == WM_HOTKEY {
                     let binding_index = msg.wParam.0;
-                    if binding_index < window_rectangle::bindings::BINDINGS.len() {
+                    if binding_index < windows_rectangle::bindings::BINDINGS.len() {
                         if let Err(err) =
                             dispatch_binding_index(binding_index, DispatchSource::Hotkey)
                         {
@@ -1705,11 +1705,11 @@ fn main() -> anyhow::Result<()> {
 **Step 2: Build the release exe on Windows**
 
 Run: `cargo build --release`
-Expected: produces `target/release/window-rectangle.exe` around 1–2 MB.
+Expected: produces `target/release/windows-rectangle.exe` around 1–2 MB.
 
 **Step 3: Run the exe**
 
-Run: `target\release\window-rectangle.exe`
+Run: `target\release\windows-rectangle.exe`
 Expected: tray icon appears (blue square). No console window in release. Hotkeys active.
 
 If a console window appears, add to `src/main.rs` at the top (above `#[cfg]` attributes):
@@ -1800,7 +1800,7 @@ Out-of-scope items from design (config file, GUI settings, autostart, etc.) are 
 
 ## Execution Handoff
 
-Plan complete and saved to `docs/plans/2026-05-05-window-rectangle-implementation.md`. Two execution options:
+Plan complete and saved to `docs/plans/2026-05-05-windows-rectangle-implementation.md`. Two execution options:
 
 1. **Subagent-Driven (this session)** — fresh subagent per task, review between tasks, fast iteration.
 2. **Parallel Session (separate)** — open new session with executing-plans, batch execution with checkpoints.

@@ -1,15 +1,15 @@
 [package]
-name = "window-rectangle"
+name = "windows-rectangle"
 version = "0.0.2"
 edition = "2021"
 description = "Windows tray app to resize active window via hotkeys"
 
 [lib]
-name = "window_rectangle"
+name = "windows_rectangle"
 path = "src/lib.rs"
 
 [[bin]]
-name = "window-rectangle"
+name = "windows-rectangle"
 path = "src/main.rs"
 
 [dependencies]

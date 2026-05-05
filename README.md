@@ -1,18 +1,18 @@
 <p align="center">
-  <img src="window-rectangle.png" alt="Window Rectangle" width="160">
+  <img src="windows-rectangle.png" alt="Windows Rectangle" width="160">
 </p>
 
-<h1 align="center">Window Rectangle</h1>
+<h1 align="center">Windows Rectangle</h1>
 
 <p align="center">
   <strong>🪟 Snap windows into place with keyboard shortcuts — Rectangle for Windows.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/yanmad27/window-rectangle/releases"><img src="https://img.shields.io/github/v/release/yanmad27/window-rectangle?style=flat-square&color=blue" alt="Release"></a>
-  <a href="https://github.com/yanmad27/window-rectangle/actions"><img src="https://img.shields.io/github/actions/workflow/status/yanmad27/window-rectangle/release.yml?style=flat-square&label=build" alt="Build"></a>
+  <a href="https://github.com/yanmad27/windows-rectangle/releases"><img src="https://img.shields.io/github/v/release/yanmad27/windows-rectangle?style=flat-square&color=blue" alt="Release"></a>
+  <a href="https://github.com/yanmad27/windows-rectangle/actions"><img src="https://img.shields.io/github/actions/workflow/status/yanmad27/windows-rectangle/release.yml?style=flat-square&label=build" alt="Build"></a>
   <a href="#license"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License"></a>
-  <a href="https://github.com/yanmad27/window-rectangle"><img src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows" alt="Platform"></a>
+  <a href="https://github.com/yanmad27/windows-rectangle"><img src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6?style=flat-square&logo=windows" alt="Platform"></a>
   <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/built%20with-Rust-orange?style=flat-square&logo=rust" alt="Built with Rust"></a>
 </p>
 
@@ -29,7 +29,7 @@
 
 ## 🚀 Quick Start
 
-1. **Download** the latest `window-rectangle-*.exe` from the [Releases](https://github.com/yanmad27/window-rectangle/releases) page
+1. **Download** the latest `windows-rectangle-*.exe` from the [Releases](https://github.com/yanmad27/windows-rectangle/releases) page
 2. **Double-click** to run — a blue square icon appears in the system tray
 3. **Start snapping** windows with `Ctrl + Alt + Arrow Keys`
 
@@ -100,7 +100,7 @@ All shortcuts use the `Ctrl + Alt` modifier:
 cargo build --release --target x86_64-pc-windows-msvc
 ```
 
-The binary lands at `target\x86_64-pc-windows-msvc\release\window-rectangle.exe`.
+The binary lands at `target\x86_64-pc-windows-msvc\release\windows-rectangle.exe`.
 
 ### Cross-Platform Check
 

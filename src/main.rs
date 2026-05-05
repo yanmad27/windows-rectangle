@@ -2,7 +2,7 @@
 
 #[cfg(not(target_os = "windows"))]
 fn main() {
-    eprintln!("window-rectangle is Windows-only");
+    eprintln!("windows-rectangle is Windows-only");
     std::process::exit(1);
 }
 
@@ -10,7 +10,7 @@ fn main() {
 fn main() -> anyhow::Result<()> {
     use anyhow::anyhow;
     use std::time::Duration;
-    use window_rectangle::win::{
+    use windows_rectangle::win::{
         dispatcher::{dispatch_binding_index, DispatchSource},
         foreground::{install_hook, register_own_window, uninstall_hook},
         hotkey::{register_all, unregister_all},
@@ -28,7 +28,7 @@ fn main() -> anyhow::Result<()> {
 
     let event_loop = EventLoop::builder().with_any_thread(false).build()?;
     let attributes = WindowAttributes::default()
-        .with_title("window-rectangle-msg")
+        .with_title("windows-rectangle-msg")
         .with_visible(false)
         .with_window_level(WindowLevel::AlwaysOnBottom);
 
@@ -55,7 +55,7 @@ fn main() -> anyhow::Result<()> {
             while PeekMessageW(&mut msg, message_window_hwnd, 0, 0, PM_REMOVE).as_bool() {
                 if msg.message == WM_HOTKEY {
                     let binding_index = msg.wParam.0;
-                    if binding_index < window_rectangle::bindings::BINDINGS.len() {
+                    if binding_index < windows_rectangle::bindings::BINDINGS.len() {
                         if let Err(err) =
                             dispatch_binding_index(binding_index, DispatchSource::Hotkey)
                         {

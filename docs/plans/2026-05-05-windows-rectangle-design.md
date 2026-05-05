@@ -1,4 +1,4 @@
-# Window Rectangle — Design
+# Windows Rectangle — Design
 
 **Date:** 2026-05-05
 **Status:** Design approved, ready for implementation plan
@@ -183,7 +183,7 @@ Hotkey labels are display-only text. Each action item is built from the same `BI
 ## File Layout
 
 ```
-window-rectangle/
+windows-rectangle/
 ├── Cargo.toml
 ├── build.rs                # embed manifest + icon via embed-resource
 ├── app.manifest            # PerMonitorV2 DPI
@@ -205,7 +205,7 @@ window-rectangle/
 
 ```toml
 [package]
-name = "window-rectangle"
+name = "windows-rectangle"
 version = "0.1.0"
 edition = "2021"
 

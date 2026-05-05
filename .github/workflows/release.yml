@@ -57,8 +57,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          cp target/x86_64-pc-windows-msvc/release/window-rectangle.exe \
-             dist/window-rectangle-${{ steps.resolve_tag.outputs.tag }}-x86_64-pc-windows-msvc.exe
+          cp target/x86_64-pc-windows-msvc/release/windows-rectangle.exe \
+             dist/windows-rectangle-${{ steps.resolve_tag.outputs.tag }}-x86_64-pc-windows-msvc.exe
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
@@ -66,4 +66,4 @@ jobs:
           tag_name: ${{ steps.resolve_tag.outputs.tag }}
           name: ${{ steps.resolve_tag.outputs.tag }}
           generate_release_notes: true
-          files: dist/window-rectangle-${{ steps.resolve_tag.outputs.tag }}-x86_64-pc-windows-msvc.exe
+          files: dist/windows-rectangle-${{ steps.resolve_tag.outputs.tag }}-x86_64-pc-windows-msvc.exe
