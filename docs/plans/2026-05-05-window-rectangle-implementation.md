@@ -895,7 +895,6 @@ pub mod monitor;
 ```rust
 use crate::geometry::Rect;
 use anyhow::{anyhow, Result};
-use std::cell::RefCell;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, RECT};
 use windows::Win32::Graphics::Gdi::{
     EnumDisplayMonitors, GetMonitorInfoW, MonitorFromWindow, HDC, HMONITOR, MONITORINFO,
@@ -909,42 +908,39 @@ pub struct MonitorEntry {
 }
 
 pub fn enumerate_monitors() -> Result<Vec<MonitorEntry>> {
-    thread_local! {
-        static COLLECTED: RefCell<Vec<MonitorEntry>> = RefCell::new(Vec::new());
-    }
-
-    COLLECTED.with(|cell| cell.borrow_mut().clear());
-
-    unsafe extern "system" fn enum_proc(
-        monitor_handle: HMONITOR,
-        _hdc: HDC,
-        _clip_rect: *mut RECT,
-        _lparam: LPARAM,
-    ) -> BOOL {
-        let mut info = MONITORINFO {
-            cbSize: std::mem::size_of::<MONITORINFO>() as u32,
-            ..Default::default()
-        };
-        if GetMonitorInfoW(monitor_handle, &mut info).as_bool() {
-            COLLECTED.with(|cell| {
-                cell.borrow_mut().push(MonitorEntry {
-                    handle: monitor_handle,
-                    work_area: rect_from_win32(info.rcWork),
-                    monitor_area: rect_from_win32(info.rcMonitor),
-                });
-            });
-        }
-        BOOL(1)
-    }
-
+    let mut collected: Vec<MonitorEntry> = Vec::new();
     unsafe {
-        let ok = EnumDisplayMonitors(None, None, Some(enum_proc), LPARAM(0));
-        if !ok.as_bool() {
-            return Err(anyhow!("EnumDisplayMonitors failed"));
-        }
+        EnumDisplayMonitors(
+            None,
+            None,
+            Some(enum_proc),
+            LPARAM(&mut collected as *mut Vec<MonitorEntry> as isize),
+        )
+        .ok()
+        .map_err(|e| anyhow!("EnumDisplayMonitors failed: {e}"))?;
     }
+    Ok(collected)
+}
 
-    Ok(COLLECTED.with(|cell| cell.replace(Vec::new())))
+unsafe extern "system" fn enum_proc(
+    monitor_handle: HMONITOR,
+    _hdc: HDC,
+    _clip_rect: *mut RECT,
+    lparam: LPARAM,
+) -> BOOL {
+    let mut info = MONITORINFO {
+        cbSize: std::mem::size_of::<MONITORINFO>() as u32,
+        ..Default::default()
+    };
+    if GetMonitorInfoW(monitor_handle, &mut info).as_bool() {
+        let collected = &mut *(lparam.0 as *mut Vec<MonitorEntry>);
+        collected.push(MonitorEntry {
+            handle: monitor_handle,
+            work_area: rect_from_win32(info.rcWork),
+            monitor_area: rect_from_win32(info.rcMonitor),
+        });
+    }
+    BOOL(1)
 }
 
 pub fn monitor_from_window(window: HWND) -> HMONITOR {
@@ -957,9 +953,9 @@ pub fn work_area_for(monitor_handle: HMONITOR) -> Result<Rect> {
             cbSize: std::mem::size_of::<MONITORINFO>() as u32,
             ..Default::default()
         };
-        if !GetMonitorInfoW(monitor_handle, &mut info).as_bool() {
-            return Err(anyhow!("GetMonitorInfoW failed"));
-        }
+        GetMonitorInfoW(monitor_handle, &mut info)
+            .ok()
+            .map_err(|e| anyhow!("GetMonitorInfoW failed: {e}"))?;
         Ok(rect_from_win32(info.rcWork))
     }
 }
