@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>window-rectangle — Resize windows on Windows with hotkeys</title>
+    <meta
+      name="description"
+      content="Tiny tray app for Windows that snaps the active window with global hotkeys. Inspired by macOS Rectangle. Free and open source."
+    />
+    <meta property="og:title" content="window-rectangle" />
+    <meta
+      property="og:description"
+      content="Snap any Windows window with a hotkey. Halves, quarters, repeat-cycle across monitors."
+    />
+    <meta property="og:image" content="/window-rectangle.png" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/window-rectangle.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      kbd {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <header class="mx-auto max-w-3xl px-6 pt-16 pb-10 text-center">
+      <img
+        src="/window-rectangle.png"
+        alt="window-rectangle icon"
+        class="mx-auto h-32 w-auto"
+      />
+      <h1 class="mt-6 text-4xl font-bold tracking-tight sm:text-5xl">
+        window-rectangle
+      </h1>
+      <p class="mt-3 text-lg text-slate-600">
+        Snap any window on Windows with a hotkey. Inspired by macOS Rectangle.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a
+          href="https://github.com/yanmad27/window-rectangle/releases/latest"
+          class="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-slate-700"
+          >Download for Windows</a
+        >
+        <a
+          href="https://github.com/yanmad27/window-rectangle"
+          class="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-100"
+          >View on GitHub</a
+        >
+      </div>
+      <p class="mt-3 text-xs text-slate-500">
+        ~1–2 MB exe · Windows 10 / 11 · Free &amp; open source (MIT)
+      </p>
+    </header>
+
+    <section class="mx-auto max-w-3xl px-6 pb-12">
+      <h2 class="text-2xl font-bold">What it does</h2>
+      <ul class="mt-4 space-y-2 text-slate-700">
+        <li>• Halve the active window left, right, top, or bottom.</li>
+        <li>• Drop it into any corner as a quarter.</li>
+        <li>• Maximize toggle, center, restore previous size.</li>
+        <li>
+          • Press the same halve hotkey again to <em>throw</em> the window onto
+          the adjacent monitor.
+        </li>
+        <li>
+          • Tray menu lists every binding; clicking acts on the previously
+          focused window.
+        </li>
+        <li>• Per-monitor DPI aware. Single exe. No installer.</li>
+      </ul>
+    </section>
+
+    <section class="mx-auto max-w-3xl px-6 pb-12">
+      <h2 class="text-2xl font-bold">Default hotkeys</h2>
+      <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-100 text-left text-slate-700">
+            <tr>
+              <th class="px-4 py-2">Hotkey</th>
+              <th class="px-4 py-2">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr>
+              <td class="px-4 py-2"><kbd>Ctrl+Alt+Left</kbd></td>
+              <td class="px-4 py-2">Halve Left (repeat → previous monitor)</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2"><kbd>Ctrl+Alt+Right</kbd></td>
+              <td class="px-4 py-2">Halve Right (repeat → next monitor)</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2"><kbd>Ctrl+Alt+Up</kbd></td>
+              <td class="px-4 py-2">Halve Top</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2"><kbd>Ctrl+Alt+Down</kbd></td>
+              <td class="px-4 py-2">Halve Bottom</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2"><kbd>Ctrl+Alt+U / I / J / K</kbd></td>
+              <td class="px-4 py-2">Quarter TL / TR / BL / BR</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2"><kbd>Ctrl+Alt+Enter</kbd></td>
+              <td class="px-4 py-2">Maximize toggle</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2"><kbd>Ctrl+Alt+C</kbd></td>
+              <td class="px-4 py-2">Center</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2"><kbd>Ctrl+Alt+R</kbd></td>
+              <td class="px-4 py-2">Restore previous size</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl px-6 pb-12">
+      <h2 class="text-2xl font-bold">Install</h2>
+      <ol class="mt-4 list-decimal space-y-2 pl-6 text-slate-700">
+        <li>
+          Download the latest <code>window-rectangle-*.exe</code> from the
+          <a
+            class="text-blue-600 underline"
+            href="https://github.com/yanmad27/window-rectangle/releases/latest"
+            >releases page</a
+          >.
+        </li>
+        <li>Double-click to run. A blue-and-green window icon appears in the system tray.</li>
+        <li>Hotkeys are active immediately. Right-click the tray icon for the menu.</li>
+        <li>
+          To launch on login, drop a shortcut into <code>shell:startup</code>.
+        </li>
+        <li>To quit: tray icon → <em>Quit</em>.</li>
+      </ol>
+    </section>
+
+    <section class="mx-auto max-w-3xl px-6 pb-12">
+      <h2 class="text-2xl font-bold">Build from source</h2>
+      <p class="mt-3 text-slate-700">
+        Requires Rust stable and the <code>x86_64-pc-windows-msvc</code> target.
+      </p>
+      <pre
+        class="mt-3 overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100"
+><code>cargo build --release --target x86_64-pc-windows-msvc</code></pre>
+      <p class="mt-3 text-slate-700">
+        Output: <code>target\x86_64-pc-windows-msvc\release\window-rectangle.exe</code>.
+      </p>
+    </section>
+
+    <footer class="mx-auto max-w-3xl px-6 pb-16 text-center text-sm text-slate-500">
+      MIT License ·
+      <a
+        class="text-blue-600 underline"
+        href="https://github.com/yanmad27/window-rectangle"
+        >github.com/yanmad27/window-rectangle</a
+      >
+    </footer>
+  </body>
+</html>
