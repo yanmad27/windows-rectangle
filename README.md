@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="window-rectangle.png" alt="window-rectangle" width="200">
+</p>
+
 # window-rectangle
 
 Windows tray app that resizes the active window via global hotkeys. Inspired by macOS Rectangle.

@@ -32,7 +32,7 @@ pub fn build_tray() -> Result<TrayHandle> {
     let quit_menu_id = quit_item.id().clone();
     menu.append(&quit_item)?;
 
-    let icon = solid_color_icon(0x3B, 0x82, 0xF6); // blue
+    let icon = load_app_icon()?;
     let tray = TrayIconBuilder::new()
         .with_tooltip("Window Rectangle")
         .with_icon(icon)
@@ -61,14 +61,7 @@ fn group_of(label: &str) -> &'static str {
     }
 }
 
-fn solid_color_icon(r: u8, g: u8, b: u8) -> Icon {
-    const SIZE: u32 = 32;
-    let mut rgba = Vec::with_capacity((SIZE * SIZE * 4) as usize);
-    for _ in 0..(SIZE * SIZE) {
-        rgba.push(r);
-        rgba.push(g);
-        rgba.push(b);
-        rgba.push(255);
-    }
-    Icon::from_rgba(rgba, SIZE, SIZE).expect("valid rgba buffer")
+/// Load the embedded ICON resource (id 2 in app.rc) as the tray icon.
+fn load_app_icon() -> Result<Icon> {
+    Icon::from_resource(2, None).map_err(|e| anyhow!("icon load failed: {e}"))
 }
