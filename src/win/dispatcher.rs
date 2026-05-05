@@ -2,7 +2,7 @@ use crate::adjacency::find_adjacent_monitor;
 use crate::bindings::BINDINGS;
 use crate::cycle_state::{CycleDecision, CycleState};
 use crate::geometry::{compute_target_rect, Action};
-use crate::win::foreground::last_real_foreground;
+use crate::win::foreground::{is_own_window, last_real_foreground};
 use crate::win::monitor::{enumerate_monitors, monitor_from_window, work_area_for};
 use crate::win::window_ops::{
     apply_rect, current_rect, foreground_window, is_valid_window, maximize_toggle, restore_original,
@@ -31,10 +31,17 @@ pub fn dispatch_binding_index(index: usize, source: DispatchSource) -> Result<()
     let action = BINDINGS[index].action;
     let target_window = match source {
         DispatchSource::Hotkey => foreground_window(),
-        DispatchSource::TrayMenu => last_real_foreground(),
+        // Tray path: by the time the MenuEvent channel is drained, the popup
+        // has already closed and Windows has restored focus to the previously
+        // focused real window — so the live foreground is usually the correct
+        // target. Reject our own hidden window if it somehow surfaces, and
+        // fall back to the SetWinEventHook cache as a last resort.
+        DispatchSource::TrayMenu => foreground_window()
+            .filter(|hwnd| !is_own_window(*hwnd))
+            .or_else(last_real_foreground),
     };
     let Some(target_window) = target_window else {
-        return Ok(()); // no target, silently no-op
+        return Ok(());
     };
     if !is_valid_window(target_window) {
         return Ok(());

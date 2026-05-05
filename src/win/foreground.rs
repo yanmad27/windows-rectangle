@@ -67,8 +67,12 @@ pub fn last_real_foreground() -> Option<HWND> {
     }
 }
 
-fn is_own(window: HWND) -> bool {
+pub fn is_own_window(window: HWND) -> bool {
     OWN_WINDOWS.lock().unwrap().contains(&(window.0 as isize))
+}
+
+fn is_own(window: HWND) -> bool {
+    is_own_window(window)
 }
 
 fn is_top_level_visible(window: HWND) -> bool {
