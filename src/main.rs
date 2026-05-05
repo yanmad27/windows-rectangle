@@ -18,7 +18,7 @@ fn main() -> anyhow::Result<()> {
     };
     use windows::Win32::Foundation::HWND;
     use windows::Win32::UI::WindowsAndMessaging::{
-        DispatchMessageW, PeekMessageW, TranslateMessage, MSG, PM_REMOVE, WM_HOTKEY, WM_QUIT,
+        DispatchMessageW, PeekMessageW, TranslateMessage, MSG, PM_REMOVE, WM_HOTKEY,
     };
     use winit::event::Event;
     use winit::event_loop::{ControlFlow, EventLoop};
@@ -54,16 +54,17 @@ fn main() -> anyhow::Result<()> {
             let mut msg = MSG::default();
             while PeekMessageW(&mut msg, message_window_hwnd, 0, 0, PM_REMOVE).as_bool() {
                 if msg.message == WM_HOTKEY {
-                    let binding_index = msg.wParam.0 as usize;
-                    if let Err(err) = dispatch_binding_index(binding_index, DispatchSource::Hotkey) {
-                        eprintln!("hotkey dispatch error: {err}");
+                    let binding_index = msg.wParam.0;
+                    if binding_index < window_rectangle::bindings::BINDINGS.len() {
+                        if let Err(err) =
+                            dispatch_binding_index(binding_index, DispatchSource::Hotkey)
+                        {
+                            eprintln!("hotkey dispatch error: {err}");
+                        }
                     }
                 } else {
                     let _ = TranslateMessage(&msg);
                     DispatchMessageW(&msg);
-                }
-                if msg.message == WM_QUIT {
-                    target.exit();
                 }
             }
         }
